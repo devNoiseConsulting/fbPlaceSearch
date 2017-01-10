@@ -3,8 +3,8 @@ let {
   FacebookApiException
 } = require('fb');
 
-const app_id = '1285125588201073';
-const app_secret = '614c3523ef4f487b1ed184fde323c08a';
+const app_id = process.env.APP_ID;
+const app_secret = process.env.APP_SECRET;
 
 const breweryApp = FB.extend({
   appId: app_id,

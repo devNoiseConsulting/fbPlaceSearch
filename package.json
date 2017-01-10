@@ -1,0 +1,30 @@
+{
+  "name": "fb-place-search",
+  "version": "1.0.0",
+  "description": "Script to pull places from Facebook's Graph API and convert to geoJSON",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "setenv": "source .env;env | grep '^APP_' | sort"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devNoiseConsulting/fbPlaceSearch.git"
+  },
+  "keywords": [
+    "facebook",
+    "graph",
+    "api",
+    "geojson"
+  ],
+  "author": "Michael J. Flynn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devNoiseConsulting/fbPlaceSearch/issues"
+  },
+  "homepage": "https://github.com/devNoiseConsulting/fbPlaceSearch#readme",
+  "dependencies": {
+    "fb": "^1.1.1"
+  }
+}
