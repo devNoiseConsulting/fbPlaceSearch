@@ -25,14 +25,17 @@ parent_page
 single_line_address
 */
 
-const fields = 'id,name,website,single_line_address,location,current_location,store_location_descriptor,parent_page,category,hours';
 const latLng = '39.95,-75.16';
-const distance = '20000';
+const distance = 161000;
+const fields = 'id,name,website,single_line_address,location,current_location,store_location_descriptor,parent_page,category,hours';
+const limit = 25;
+
 //let brewerySearch = `/search?q=brewery|brewing&type=place&center=${latLng}&distance=${distance}&fields=${fields}`;
-let brewerySearch = `/search?q=brewery&type=place&center=${latLng}&distance=${distance}&fields=${fields}`;
-let brewingSearch = '/search?q=brewing&type=place&center=39.95,-75.16&distance=10000&' + fields;
+let brewerySearch = `/search?q=brewery&type=place&center=${latLng}&distance=${distance}&fields=${fields}&limit=${limit}`;
+let brewingSearch = `/search?q=brewing&type=place&center=${latLng}&distance=${distance}&fields=${fields}&limit=${limit}`;
 
 let places = [];
+let searchCount = 0;
 
 FB.api('oauth/access_token', {
   client_id: app_id,
@@ -47,8 +50,10 @@ FB.api('oauth/access_token', {
   var accessToken = res.access_token;
   FB.setAccessToken(accessToken);
 
-  // testGet();
+  searchCount++;
   searchGet(brewerySearch);
+  searchCount++;
+  searchGet(brewingSearch);
   //testFbId('42338591948');
 });
 
@@ -58,17 +63,6 @@ GET graph.facebook.com
     q={your-query}&
     type={object-type}
 */
-function testGet() {
-  FB.api('4', function(res) {
-    if (!res || res.error) {
-      console.log(!res ? 'error occurred' : res.error);
-      return;
-    }
-    console.log(res.id);
-    console.log(res.name);
-  });
-}
-
 function testFbId(fbid) {
   let request = fbid + '?metadata=0&' + fields;
   FB.api(request, function(res) {
@@ -99,7 +93,7 @@ function searchGet(search) {
       console.log(!res ? 'error occurred' : res.error);
       return;
     }
-    console.log(res);
+    //console.log(res);
     const newPlace = res.data.filter(place => place.website && place.location.street);
     places = places.concat(newPlace);
     //console.log(places);
@@ -109,20 +103,29 @@ function searchGet(search) {
         searchGet(res.paging.next.substr(32));
       }, 1000);
     } else {
+      places = places.filter((thing, index, self) => self.findIndex((t) => {return t.id === thing.id; }) === index);
       placesToFeatureCollection(places);
     }
   });
 }
 
-function placesToFeatureCollection(places) {
-  let featureCollection = {
-    "type": "FeatureCollection",
-    "features": []
-  };
-  featureCollection.features = places.map(placeToFeature);
-  console.log(featureCollection.features.length);
-  //console.log(JSON.stringify(featureCollection, null, 2));
+function dedupPlaces(places) {
+    places.sort();
+}
 
+function placesToFeatureCollection(places) {
+  searchCount--;
+  if (searchCount === 0){
+    let featureCollection = {
+      "type": "FeatureCollection",
+      "features": []
+    };
+    featureCollection.features = places.map(placeToFeature);
+    console.log('features count = ' + featureCollection.features.length);
+    console.log(JSON.stringify(featureCollection, null, 2));
+  } else {
+    console.log('A search is still active.');
+  }
 }
 
 function placeToFeature(place) {
@@ -146,14 +149,3 @@ function placeToFeature(place) {
       };
       return feature;
 }
-
-/*
-FB.api(
-  '/search',
-  'GET',
-  {"q":"brewery|brewing","type":"place","center":"39.95,-75.16","distance":"161000","fields":"id,name,website,single_line_address,location,current_location,store_location_descriptor,parent_page,category,hours"},
-  function(response) {
-      // Insert your code here
-  }
-);
-*/

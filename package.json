@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "setenv": "source .env;env | grep '^APP_' | sort"
+    "start": "source .env; node index.js",
+    "setenv": "source .env; env | grep '^APP_' | sort"
   },
   "repository": {
     "type": "git",
